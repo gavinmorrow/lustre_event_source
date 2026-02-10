@@ -14,6 +14,8 @@ pub type ReadyState {
 }
 
 pub type Message {
+  /// Sent as soon as the `EventSource` is created.
+  Init(EventSource)
   // TODO: handle data types other than string
   Data(String)
   // Named to disambiguate from `ReadyState.Open`
@@ -28,6 +30,7 @@ pub fn init(path: String, to_msg: fn(Message) -> msg) -> Effect(msg) {
   effect.from(fn(dispatch: fn(msg) -> Nil) {
     do_init(
       path:,
+      on_init: fn(event_source) { dispatch(Init(event_source) |> to_msg) },
       on_data: fn(msg) { dispatch(Data(msg) |> to_msg) },
       on_open: fn(event_source) { dispatch(OnOpen(event_source) |> to_msg) },
       on_error: fn() { dispatch(Error |> to_msg) },
@@ -39,6 +42,7 @@ pub fn init(path: String, to_msg: fn(Message) -> msg) -> Effect(msg) {
 @external(javascript, "./lustre_event_source_ffi.mjs", "init")
 fn do_init(
   path _: String,
+  on_init _: fn(EventSource) -> Nil,
   on_data _: fn(String) -> Nil,
   on_open _: fn(EventSource) -> Nil,
   on_error _: fn() -> Nil,

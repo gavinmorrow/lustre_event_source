@@ -1,5 +1,6 @@
 export const init = (
   /** @type {string} */ path,
+  /** @type {(eventSource: EventSource) => void} */ on_init,
   /** @type {(data: string) => void} */ on_data,
   /** @type {(eventSource: EventSource) => void} */ on_open,
   /** @type {() => void} */ on_error,
@@ -14,6 +15,8 @@ export const init = (
   // TODO: is it possible to handle specific errors?
   //       is there any error data available?
   eventSource.addEventListener("error", (_event) => on_error());
+
+  on_init(eventSource);
 };
 
 export const close = (/** @type {EventSource} */ event_source) =>
